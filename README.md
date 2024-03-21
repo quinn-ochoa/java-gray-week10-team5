@@ -1,92 +1,106 @@
-# Week-10-Pairs
+# Week 10 Review Pair Exercise
 
+## Context
 
+You just landed a role as a junior developer for a new eLearning startup called LearnIT.
 
-## Getting started
+Your first project is to build an application that helps students practice mathematical problem sets. The initial version of this application focuses on multiplication practice.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+Before you start, be sure to review the provided HTML and CSS and look at the mockups.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+## Application overview
 
-## Add your files
+When the application loads, it gives the student a problem set with ten multiplication problems. They'll see the problem they need to solve, how many problems they've completed, their score, and four possible answers. At any time during the problem set, the student can start over by clicking "Start Over."
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+![Math Practice: Start](./mockups/start.png)
 
+Once the student finishes all ten questions, they'll see a summary screen. This screen removes the intro text, problem, and answers.
+
+![Math Practice: Finish](./mockups/finish.png)
+
+## Application requirements
+
+- The problem set must contain ten problems but must be flexible enough to change in the future.
+- The problems must be randomly generated.
+  - The left and right operands must be between 0 and 9.
+  - The operation must be multiplication.
+- When you present a student with a problem, show four possible answers: one correct answer and three randomly generated incorrect answers.
+  - Allow them to click the `<li>` to answer the problem.
+  - Consider this: if the left and right operands are between 0 and 9, what's the max possible answer?
+- When a student answers a question, the application must:
+  - Move to the next problem.
+  - Update the current problem number.
+  - Update the score, if needed.
+- When a student answers the last question, hide any elements that have the class `show-hide` to present the summary screen.
+- When a student clicks "Start Over", the application must:
+  - Generate a new problem set.
+  - Reset the current problem.
+  - Reset the score.
+
+## Utility functions
+
+There are two functions you'll need to use in this application that weren't covered in the lessons. The first is `Math.random()`, which you can use to generate a random number. The second is `Array.sort()`, which sorts the elements of an array.
+
+### `Math.random()`
+
+[`Math`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math)
+is a built-in object that has properties and methods for mathematical constants and functions. The `random()` function returns a random floating point between 0 and 1. What you want is a number between 0 and
+some other number.
+
+You can use a combination of `Math.floor()` which returns the largest integer less than or
+equal to a given number and `Math.random()` to accomplish this:
+
+```js
+/**
+ * Utility function to generate a random number based on max
+ * @param {number} max
+ */
+function getRandomNumber(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
 ```
-cd existing_repo
-git remote add origin https://git.techelevator.com/campuses/nlr/jan-2024/java-gray/student-pairs/week-10-pairs.git
-git branch -M main
-git push -uf origin main
+
+The `max` isn't inclusive, so if you need to get a number between 0 and 9, you can call the function by passing the upper bounds:
+
+```js
+getRandomNumber(10);
 ```
 
-## Integrate with your tools
+### Shuffle array
 
-- [ ] [Set up project integrations](https://git.techelevator.com/campuses/nlr/jan-2024/java-gray/student-pairs/week-10-pairs/-/settings/integrations)
+If you create an array with four possible answers, you might want to shuffle the results so the correct answer
+isn't always in the same position. In that case, you can use the [`Array.sort()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) method.
 
-## Collaborate with your team
+This method takes a function to compare elements `a` and `b`. The function must return a positive number if `a` > `b`, negative if `a` < `b`, and `0` if they're equal. You can return random results that are sometimes positive and sometimes negative by using the `Math.random()` function to get a number from 0 to 1, and subtracting 0.5 so that it's between -0.5 and 0.5:
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+```js
+/**
+ * Utility function to shuffle the items in an array
+ * @param {object} arr
+ */
+function shuffleArray(arr) {
+  return arr.sort(function (a, b) { return Math.random() - 0.5 })
+}
+```
 
-## Test and Deploy
+If you have an array of answers in your application, you could sort them:
 
-Use the built-in continuous integration in GitLab.
+```js
+const problem = 9 * 9;
+const answers = shuffleArray([81,1,77,45]);
+```
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+## Notes
 
-***
+- The application must start when the DOM loads.
 
-# Editing this README
+## More Operators
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
+LearnIT wants to release a new version of the application that allows students to practice addition, subtraction, multiplication, or division. This means that you'd need to update the application to show a new screen that asks students to pick the math operations they want to work on.
 
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+![Operators](./mockups/operators.png)
 
-## Name
-Choose a self-explaining name for your project.
+Each problem set must still consist of ten problems, but now, they'd include one or more operations based on the student's selection.
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+You probably hard-coded the operand `*` into the initial version of the application. How would you update it to allow students to choose multiple math operations?
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
