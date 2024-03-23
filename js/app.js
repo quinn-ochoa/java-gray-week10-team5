@@ -1,6 +1,7 @@
 let a;
 let b;
 let score = 0;
+let countProblem = 0;
 
 const quizQuestion = {
     question: '',
@@ -29,17 +30,32 @@ function shuffleArray(arr) {
   }
 
 function displayMath(x, y) {
-    
     const expression = document.querySelector('.expression');
     expression.innerText = x + ' * ' + y;
-
 }
 
+function updateProblemCount(){
+    countProblem++;
+    if(countProblem < 11){
+        const currentProb = document.querySelector('.currentProblem');
+        currentProb.innerText = countProblem;
+    }
+}
+
+function resetCounts(){
+    const currentScore = document.querySelector('.currentScore');
+    score = 0;
+    currentScore.innerText = score;
+
+    const currentProb = document.querySelector('.currentProblem');
+    countProblem = 1;
+    currentProb.innerText = countProblem;
+}
 
 function displayOptions() {
+    // The reason we use a set is to avoid duplicates 
     let resSet = new Set();
     const options = document.querySelectorAll('li');
-    resSet.clear();
     
     a = getRandomNumber(10);
     b = getRandomNumber(10);
@@ -55,18 +71,18 @@ function displayOptions() {
     while(resSet.size < 4){
         resSet.add(getRandomNumber(82));
     }
-    resSet = Array.from(resSet);
-    shuffleArray(resSet);
+
+    // The reason we convert the set to an array is because the 
+    // shuffleArray function was designed to handle an array
+    resArr = Array.from(resSet);
+    shuffleArray(resArr);
     for(let i = 0; i < 4; i++) {
-        options[i].innerText = resSet[i];
+        options[i].innerText = resArr[i];
     }
     displayMath(a,b);
-
 }
 
-
-function reset() {
-
+function toggleQuiz() {
     const hideElements = document.querySelectorAll('.show-hide');
     hideElements.forEach((hideElement) => {
         if (hideElement.style.display != 'none'){
@@ -78,53 +94,49 @@ function reset() {
     })    
 }
 
-
 document.addEventListener('DOMContentLoaded', () => {
 
     const selections = document.querySelectorAll('li');
-    const userOption = document.querySelector('#answers');
     const currentScore = document.querySelector('.currentScore');
-    const currentProb = document.querySelector('.currentProblem');
+    const startOverButton = document.querySelector('#btnStartOver');
     
-    let countProblem = 1;
-
     displayOptions();
+    updateProblemCount();
         
     selections.forEach((selection) => {
         selection.addEventListener('click', (e) => {
-            
-            if(countProblem <= 10) {
-                //keep track of user's score
-                if(e.target.innerText == quizQuestion.correctAnswer) {
-                    // console.log(e.target.innerText);
-                    // console.log("correct answer: " + quizQuestion.correctAnswer);
-                    score++;
-                    currentScore.innerText = score;
-    
-                }
-                
-                displayOptions();
-                currentProb.innerText = countProblem;
-                countProblem++;
+
+            // check the whether user's answer is correct or not 
+            if(e.target.innerText == quizQuestion.correctAnswer) {
+                score++;
+                currentScore.innerText = score;
             }
-            if(countProblem > 10) {
-                reset();
-            } 
-             
-        });
             
+            // set up the next problem 
+            displayOptions();
+            updateProblemCount();
+
+            if(countProblem > 10) {
+                toggleQuiz();
+            }  
+        });     
     });
 
-    //restart the problem and the score once 'Start over' is clicked
-    const startOver = document.getElementById('btnStartOver');
-    startOver.addEventListener('click', () => {
-        reset();
-        displayOptions();
-        countProblem = 1;
-        currentProb.innerText = countProblem;
-        score = 0;
-        currentScore.innerText = score;
-        
+    startOverButton.addEventListener('click', () => {
+        toggleQuiz();   
+        resetCounts();
     })
+
+    // restart the problem and the score once 'Start over' is clicked
+    // const startOver = document.getElementById('btnStartOver');
+    // startOver.addEventListener('click', () => {
+    //     reset();
+    //     displayOptions();
+    //     countProblem = 1;
+    //     currentProb.innerText = countProblem;
+    //     score = 0;
+    //     currentScore.innerText = score;
+        
+    // })
 
 });
